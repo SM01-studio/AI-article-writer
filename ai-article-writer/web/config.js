@@ -8,15 +8,21 @@
     'use strict';
 
     // API 基础地址配置
+    // 生产环境: 使用云服务器后端
     // 开发环境: 使用本地后端
-    // 生产环境: 修改为你的后端服务器地址
 
-    // ⬇️ 生产环境部署时，修改下面的地址 ⬇️
-    window.API_BASE_URL = window.API_BASE_URL || 'http://localhost:5000/api';
+    // 检测是否在 Vercel 生产环境
+    const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
 
-    // 示例：生产环境配置
-    // window.API_BASE_URL = 'https://api.your-domain.com/api';
+    // 生产环境配置 - 指向云服务器 API
+    if (isProduction) {
+        window.API_BASE_URL = 'http://47.79.0.228/api';
+    } else {
+        // 开发环境配置 - 使用本地 API
+        window.API_BASE_URL = 'http://localhost:5000/api';
+    }
 
     console.log('🔗 API Base URL:', window.API_BASE_URL);
+    console.log('🌍 Environment:', isProduction ? 'Production' : 'Development');
 
 })();
