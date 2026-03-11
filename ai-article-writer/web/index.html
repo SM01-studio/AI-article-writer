@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Article Writer | AI科普文章自动化写作系统</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Marked.js for Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Aurora Background -->
+    <div class="aurora-container">
+        <div class="aurora aurora-1"></div>
+        <div class="aurora aurora-2"></div>
+        <div class="aurora aurora-3"></div>
+        <div class="aurora aurora-4"></div>
+    </div>
+
+    <!-- Particle Canvas -->
+    <canvas id="particles"></canvas>
+
+    <!-- Navigation -->
+    <nav class="nav-glass">
+        <div class="nav-content">
+            <div class="nav-logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
+                <span class="logo-text">AI Article Writer</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features" class="nav-link">Features 功能</a>
+                <a href="https://github.com" class="nav-link" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="main-container">
+
+        <!-- ==================== PAGE 0: Home ==================== -->
+        <section id="page-home" class="page active">
+            <div class="hero">
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <span class="badge-dot"></span>
+                        <span>Master AI Article Writing System</span>
+                    </div>
+                    <h1 class="hero-title">
+                        让AI成为你的
+                        <span class="gradient-text">写作助手</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        从深度调研到多格式排版的全流程自动化
+                        <br>
+                        <span style="font-size: 0.9em; color: var(--text-hint);">
+                            Full automation from research to multi-format publishing
+                        </span>
+                    </p>
+
+                    <!-- Main Input Card -->
+                    <div class="input-card">
+                        <div class="input-header">
+                            <span class="input-label">文章主题 Article Topic</span>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="text" id="topic" placeholder="e.g. What is Large Language Model? | 例如：什么是大语言模型？" class="topic-input">
+                            <div class="input-glow"></div>
+                        </div>
+
+                        <div class="options-grid">
+                            <div class="option-group">
+                                <label class="option-label">文章长度 Length</label>
+                                <div class="length-options">
+                                    <button class="length-btn" data-length="short">
+                                        <span class="length-icon">📝</span>
+                                        <span class="length-text">Short</span>
+                                        <span class="length-desc">~1500字</span>
+                                    </button>
+                                    <button class="length-btn active" data-length="medium">
+                                        <span class="length-icon">📄</span>
+                                        <span class="length-text">Medium</span>
+                                        <span class="length-desc">~3000字</span>
+                                    </button>
+                                    <button class="length-btn" data-length="long">
+                                        <span class="length-icon">📚</span>
+                                        <span class="length-text">Long</span>
+                                        <span class="length-desc">~8000字</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="option-group">
+                                <label class="option-label">目标读者 Audience</label>
+                                <select id="audience" class="audience-select">
+                                    <option value="general">General Public | 大众</option>
+                                    <option value="tech">Tech Professionals | 技术</option>
+                                    <option value="mixed">Mixed | 混合</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button id="startBtn" class="start-btn">
+                            <span class="btn-content">
+                                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                </svg>
+                                <span>Start Writing 开始创作</span>
+                            </span>
+                            <span class="btn-shine"></span>
+                        </button>
+
+                        <button id="load-session-btn" class="start-btn secondary" style="margin-top: 0.5rem; background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);">
+                            <span class="btn-content">
+                                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                                </svg>
+                                <span>📂 Load Session 加载会话</span>
+                            </span>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Features Section -->
+            <div id="features" class="features-section">
+                <div class="features-container">
+                    <h2 class="section-title centered">
+                        Why Choose <span class="gradient-text">AI Article Writer</span>?
+                    </h2>
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon"><span>🔍</span></div>
+                            <h3 class="feature-title">Deep Research 深度调研</h3>
+                            <p class="feature-desc">WebSearch + 微信 + 小红书三大渠道</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon"><span>🎯</span></div>
+                            <h3 class="feature-title">Precise Targeting 精准定位</h3>
+                            <p class="feature-desc">根据读者智能调整语言深度</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon"><span>🎨</span></div>
+                            <h3 class="feature-title">AI Images AI配图</h3>
+                            <p class="feature-desc">Gemini API统一风格4K配图</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon"><span>📱</span></div>
+                            <h3 class="feature-title">Multi-Format 多格式</h3>
+                            <p class="feature-desc">MD/HTML/DOCX一键导出</p>
+                        </div>
+                        <div class="feature-card highlight">
+                            <div class="feature-icon"><span>✅</span></div>
+                            <h3 class="feature-title">4-Stage Confirm 4阶段确认</h3>
+                            <p class="feature-desc">每步确认确保质量</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon"><span>🔒</span></div>
+                            <h3 class="feature-title">Secure 安全</h3>
+                            <p class="feature-desc">本地运行数据不外传</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== PAGE 1: Research ==================== -->
+        <section id="page-research" class="page">
+            <div class="page-header">
+                <button class="back-btn" onclick="goToPage('home')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    <span>Back 返回</span>
+                </button>
+                <div class="page-title-group">
+                    <span class="page-badge">Phase 1</span>
+                    <h1 class="page-title">Deep Research 深度调研</h1>
+                </div>
+                <div class="page-status">
+                    <span class="status-dot"></span>
+                    <span>Awaiting Confirmation 等待确认</span>
+                </div>
+            </div>
+
+            <div class="page-content" id="research-content">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+
+            <div class="page-actions">
+                <button class="action-btn secondary" onclick="regeneratePhase(1)">
+                    <span>🔄 重新调研 Re-Research</span>
+                </button>
+                <label class="action-btn import">
+                    <input type="file" accept=".json" onchange="importPhaseData(1, this)" hidden>
+                    <span>📥 导入 Import</span>
+                </label>
+                <button class="action-btn export" onclick="exportPhaseData(1)">
+                    <span>📤 导出 Export</span>
+                </button>
+                <button class="action-btn primary" onclick="confirmAndNext(1)">
+                    <span>Confirm & Continue 确认并继续</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- ==================== PAGE 2: Outline ==================== -->
+        <section id="page-outline" class="page">
+            <div class="page-header">
+                <button class="back-btn" onclick="goToPage('research')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    <span>Back 返回</span>
+                </button>
+                <div class="page-title-group">
+                    <span class="page-badge">Phase 2</span>
+                    <h1 class="page-title">Outline Design 大纲设计</h1>
+                </div>
+                <div class="page-status">
+                    <span class="status-dot"></span>
+                    <span>Awaiting Confirmation 等待确认</span>
+                </div>
+            </div>
+
+            <div class="page-content" id="outline-content">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+
+            <div class="page-actions">
+                <button class="action-btn secondary" onclick="regeneratePhase(2)">
+                    <span>🔄 重新生成 Regenerate</span>
+                </button>
+                <label class="action-btn import">
+                    <input type="file" accept=".json" onchange="importPhaseData(2, this)" hidden>
+                    <span>📥 导入 Import</span>
+                </label>
+                <button class="action-btn export" onclick="exportPhaseData(2)">
+                    <span>📤 导出 Export</span>
+                </button>
+                <button class="action-btn primary" onclick="confirmAndNext(2)">
+                    <span>Confirm & Continue 确认并继续</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- ==================== PAGE 3: Draft ==================== -->
+        <section id="page-draft" class="page">
+            <div class="page-header">
+                <button class="back-btn" onclick="goToPage('outline')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    <span>Back 返回</span>
+                </button>
+                <div class="page-title-group">
+                    <span class="page-badge">Phase 3</span>
+                    <h1 class="page-title">Content Writing 内容写作</h1>
+                </div>
+                <div class="page-status">
+                    <span class="status-dot"></span>
+                    <span>Awaiting Confirmation 等待确认</span>
+                </div>
+            </div>
+
+            <div class="page-content" id="draft-content">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+
+            <div class="page-actions">
+                <button class="action-btn secondary" onclick="regeneratePhase(3)">
+                    <span>🔄 重新写作 Rewrite</span>
+                </button>
+                <label class="action-btn import">
+                    <input type="file" accept=".json" onchange="importPhaseData(3, this)" hidden>
+                    <span>📥 导入 Import</span>
+                </label>
+                <button class="action-btn export" onclick="exportPhaseData(3)">
+                    <span>📤 导出 Export</span>
+                </button>
+                <button class="action-btn primary" onclick="confirmAndNext(3)">
+                    <span>Confirm & Continue 确认并继续</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- ==================== PAGE 4: Images ==================== -->
+        <section id="page-images" class="page">
+            <div class="page-header">
+                <button class="back-btn" onclick="goToPage('draft')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    <span>Back 返回</span>
+                </button>
+                <div class="page-title-group">
+                    <span class="page-badge">Phase 4</span>
+                    <h1 class="page-title">Image Generation 配图生成</h1>
+                </div>
+                <div class="page-status success">
+                    <span class="status-dot"></span>
+                    <span>Auto-Completed 自动完成</span>
+                </div>
+            </div>
+
+            <div class="page-content" id="images-content">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+
+            <div class="page-actions">
+                <button class="action-btn secondary" onclick="regeneratePhase(4)">
+                    <span>🔄 重新生成 Regenerate</span>
+                </button>
+                <label class="action-btn import">
+                    <input type="file" accept=".json" onchange="importPhaseData(4, this)" hidden>
+                    <span>📥 导入 Import</span>
+                </label>
+                <button class="action-btn export" onclick="exportPhaseData(4)">
+                    <span>📤 导出 Export</span>
+                </button>
+                <button class="action-btn primary" onclick="confirmAndNext(4)">
+                    <span>Continue 继续</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- ==================== PAGE 5: Layout ==================== -->
+        <section id="page-layout" class="page">
+            <div class="page-header">
+                <button class="back-btn" onclick="goToPage('images')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    <span>Back 返回</span>
+                </button>
+                <div class="page-title-group">
+                    <span class="page-badge">Phase 5</span>
+                    <h1 class="page-title">Layout & Export 排版输出</h1>
+                </div>
+                <div class="page-status">
+                    <span class="status-dot"></span>
+                    <span>Awaiting Confirmation 等待确认</span>
+                </div>
+            </div>
+
+            <div class="page-content" id="layout-content">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+
+            <div class="page-actions">
+                <button class="action-btn secondary" onclick="regeneratePhase(5)">
+                    <span>🔄 重新排版 Relayout</span>
+                </button>
+                <button class="action-btn primary" onclick="confirmAndNext(5)">
+                    <span>Confirm & Continue 确认并继续</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- ==================== PAGE 6: Complete ==================== -->
+        <section id="page-complete" class="page">
+            <div class="page-header">
+                <button class="back-btn" onclick="goToPage('layout')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    <span>Back 返回</span>
+                </button>
+                <div class="page-title-group">
+                    <span class="page-badge success">Complete</span>
+                    <h1 class="page-title">Export Complete 导出完成</h1>
+                </div>
+                <div class="page-status success">
+                    <span class="status-dot"></span>
+                    <span>Task Complete 任务完成</span>
+                </div>
+            </div>
+
+            <div class="page-content" id="complete-content">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+
+            <div class="page-actions">
+                <button class="action-btn primary" onclick="startNew()">
+                    <span>✨ New Article 新建文章</span>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <div class="logo-icon small">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
+                <span>AI Article Writer</span>
+            </div>
+            <p class="footer-text">Master AI Article Writing System</p>
+            <p class="footer-copyright">© 2026 Ma Siliang</p>
+        </div>
+    </footer>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
+    <!-- Scripts -->
+    <script src="config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

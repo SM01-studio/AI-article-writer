@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Environment variables (contains secrets!)
+.env
+.env.local
+.env.production
+
+# Output files (generated content, should not be committed)
+output/
+ai-article-writer/web/tasks/
+ai-article-writer/web/shared/
+ai-article-writer/web/output/
+
+# Config files with sensitive data
+gemini_config.json
+*/gemini_config.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# MCP local caches
+weixin_search_mcp/.venv/
+xiaohongshu_mcp/.venv/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+weixin_search_mcp/

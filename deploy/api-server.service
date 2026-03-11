@@ -1,0 +1,18 @@
+[Unit]
+Description=AI Article Writer API Server
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/ai-article-writer/ai-article-writer/web
+Environment="PATH=/home/ubuntu/ai-article-writer/.venv/bin"
+EnvironmentFile=/home/ubuntu/ai-article-writer/.env
+ExecStart=/home/ubuntu/ai-article-writer/.venv/bin/python api_server.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

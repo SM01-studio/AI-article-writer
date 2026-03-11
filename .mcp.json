@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "weixin": {
+      "command": "/Users/www.macpe.cn/CC_AI_WRITER/weixin_search_mcp/.venv/bin/python3",
+      "args": [
+        "-m",
+        "weixin_search_mcp.main",
+        "--transport",
+        "stdio"
+      ],
+      "cwd": "/Users/www.macpe.cn/CC_AI_WRITER/weixin_search_mcp"
+    },
+    "xiaohongshu": {
+      "command": "/Users/www.macpe.cn/CC_AI_WRITER/xiaohongshu_mcp/.venv/bin/python3",
+      "args": [
+        "/Users/www.macpe.cn/CC_AI_WRITER/xiaohongshu_mcp/xiaohongshu_mcp.py",
+        "--stdio"
+      ]
+    }
+  }
+}

@@ -1,0 +1,154 @@
+<!--
+  微信公众号排版模板
+
+  特点：
+  - 使用内联CSS样式（微信不支持外部样式）
+  - 适配微信阅读体验
+  - 图片居中对齐
+  - 限制最大宽度
+
+  使用方式：
+  1. 将文章内容替换到 CONTENT HERE 标记处
+  2. 将图片路径替换为实际路径
+  3. 复制到微信公众号编辑器
+
+  注意：模板中的 images/*.png 路径为占位符，实际使用时需替换为真实图片路径
+-->
+
+<section style="max-width: 100%; margin: 0 auto; padding: 20px 16px; font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;">
+
+  <!-- 文章标题 -->
+  <h1 style="margin: 0 0 8px 0; font-size: 22px; font-weight: bold; color: #000; line-height: 1.4; text-align: center;">
+    {{ARTICLE_TITLE}}
+  </h1>
+
+  <!-- 文章元信息 -->
+  <p style="margin: 0 0 24px 0; font-size: 14px; color: #999; text-align: center;">
+    {{AUTHOR}} · {{DATE}} · 阅读约 {{READING_TIME}} 分钟
+  </p>
+
+  <!-- 封面图 (占位符路径，实际使用时替换) -->
+  <div style="text-align: center; margin: 0 0 24px 0;">
+    <!-- img src="images/cover.png" 替换为实际图片路径 -->
+    <img src="{{COVER_IMAGE}}" style="max-width: 100%; height: auto; border-radius: 8px;" alt="封面图">
+  </div>
+
+  <!-- ========== CONTENT HERE ========== -->
+
+  <!-- 引言段落示例 -->
+  <p style="margin: 0 0 16px 0; line-height: 1.8; color: #333; font-size: 16px; text-align: justify;">
+    {{INTRODUCTION}}
+  </p>
+
+  <!-- 分割线 -->
+  <hr style="margin: 24px 0; border: none; border-top: 1px solid #eee;">
+
+  <!-- 一级标题 -->
+  <h2 style="margin: 24px 0 16px 0; font-size: 18px; font-weight: bold; color: #000; padding-left: 12px; border-left: 4px solid #007AFF;">
+    {{SECTION_TITLE}}
+  </h2>
+
+  <!-- 正文段落 -->
+  <p style="margin: 0 0 16px 0; line-height: 1.8; color: #333; font-size: 16px; text-align: justify;">
+    {{PARAGRAPH}}
+  </p>
+
+  <!-- 重点强调 -->
+  <p style="margin: 0 0 16px 0; line-height: 1.8; color: #333; font-size: 16px; text-align: justify;">
+    <strong style="color: #007AFF; font-weight: bold;">{{HIGHLIGHT}}</strong> 后续内容...
+  </p>
+
+  <!-- 引用块 -->
+  <blockquote style="margin: 16px 0; padding: 12px 16px; background: #f5f5f5; border-left: 4px solid #007AFF; color: #666; font-size: 15px; line-height: 1.8;">
+    {{QUOTE}}
+  </blockquote>
+
+  <!-- 无序列表 -->
+  <ul style="margin: 12px 0 16px 0; padding-left: 20px; line-height: 1.8; color: #333; font-size: 16px;">
+    <li style="margin: 8px 0;">{{LIST_ITEM_1}}</li>
+    <li style="margin: 8px 0;">{{LIST_ITEM_2}}</li>
+    <li style="margin: 8px 0;">{{LIST_ITEM_3}}</li>
+  </ul>
+
+  <!-- 有序列表 -->
+  <ol style="margin: 12px 0 16px 0; padding-left: 20px; line-height: 1.8; color: #333; font-size: 16px;">
+    <li style="margin: 8px 0;">{{ORDERED_ITEM_1}}</li>
+    <li style="margin: 8px 0;">{{ORDERED_ITEM_2}}</li>
+    <li style="margin: 8px 0;">{{ORDERED_ITEM_3}}</li>
+  </ol>
+
+  <!-- 章节配图 -->
+  <div style="text-align: center; margin: 20px 0;">
+    <!-- img src="images/chapter-1.png" 替换为实际图片路径 -->
+    <img src="{{CHAPTER_IMAGE}}" style="max-width: 100%; height: auto; border-radius: 8px;" alt="{{IMAGE_DESCRIPTION}}">
+    <p style="margin: 8px 0 0 0; font-size: 14px; color: #999; text-align: center;">{{IMAGE_CAPTION}}</p>
+  </div>
+
+  <!-- 二级标题 -->
+  <h3 style="margin: 20px 0 12px 0; font-size: 16px; font-weight: bold; color: #333;">
+    {{SUBSECTION_TITLE}}
+  </h3>
+
+  <!-- 代码块 -->
+  <pre style="margin: 16px 0; padding: 16px; background: #2d2d2d; color: #f8f8f2; border-radius: 8px; font-size: 14px; line-height: 1.6; overflow-x: auto;"><code>{{CODE_BLOCK}}</code></pre>
+
+  <!-- 行内代码 -->
+  <p style="margin: 0 0 16px 0; line-height: 1.8; color: #333; font-size: 16px; text-align: justify;">
+    使用 <code style="background: #f4f4f4; padding: 2px 6px; border-radius: 4px; font-size: 14px; color: #e83e8c;">{{INLINE_CODE}}</code> 来实现...
+  </p>
+
+  <!-- 表格 -->
+  <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15px;">
+    <thead>
+      <tr style="background: #f5f5f5;">
+        <th style="padding: 12px; border: 1px solid #ddd; text-align: left; font-weight: bold;">{{HEADER_1}}</th>
+        <th style="padding: 12px; border: 1px solid #ddd; text-align: left; font-weight: bold;">{{HEADER_2}}</th>
+        <th style="padding: 12px; border: 1px solid #ddd; text-align: left; font-weight: bold;">{{HEADER_3}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding: 12px; border: 1px solid #ddd;">{{CELL_1_1}}</td>
+        <td style="padding: 12px; border: 1px solid #ddd;">{{CELL_1_2}}</td>
+        <td style="padding: 12px; border: 1px solid #ddd;">{{CELL_1_3}}</td>
+      </tr>
+      <tr>
+        <td style="padding: 12px; border: 1px solid #ddd;">{{CELL_2_1}}</td>
+        <td style="padding: 12px; border: 1px solid #ddd;">{{CELL_2_2}}</td>
+        <td style="padding: 12px; border: 1px solid #ddd;">{{CELL_2_3}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 分割线 -->
+  <hr style="margin: 32px 0; border: none; border-top: 1px solid #eee;">
+
+  <!-- 结语 -->
+  <h2 style="margin: 24px 0 16px 0; font-size: 18px; font-weight: bold; color: #000; padding-left: 12px; border-left: 4px solid #007AFF;">
+    结语
+  </h2>
+
+  <p style="margin: 0 0 16px 0; line-height: 1.8; color: #333; font-size: 16px; text-align: justify;">
+    {{CONCLUSION}}
+  </p>
+
+  <!-- ========== END CONTENT ========== -->
+
+  <!-- 参考资料 -->
+  <hr style="margin: 32px 0; border: none; border-top: 1px solid #eee;">
+
+  <p style="margin: 0 0 12px 0; font-size: 14px; font-weight: bold; color: #666;">
+    参考资料：
+  </p>
+
+  <ol style="margin: 0 0 16px 0; padding-left: 20px; line-height: 1.8; color: #666; font-size: 14px;">
+    <li style="margin: 4px 0;"><a href="{{REF_URL_1}}" style="color: #007AFF; text-decoration: none;">{{REF_TITLE_1}}</a></li>
+    <li style="margin: 4px 0;"><a href="{{REF_URL_2}}" style="color: #007AFF; text-decoration: none;">{{REF_TITLE_2}}</a></li>
+  </ol>
+
+  <!-- 版权信息 -->
+  <p style="margin: 24px 0 0 0; font-size: 12px; color: #999; text-align: center;">
+    本文由 AI Article Writer 生成 · 转载请注明出处
+  </p>
+
+</section>

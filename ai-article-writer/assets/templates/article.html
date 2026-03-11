@@ -1,0 +1,534 @@
+<!--
+  HTML富文本排版模板
+
+  特点：
+  - 完整HTML文档
+  - 响应式设计
+  - 优雅的排版样式
+
+  使用方式：
+  1. 将 {{PLACEHOLDER}} 替换为实际内容
+  2. 将 images/*.png 路径替换为实际图片路径
+  3. 可直接在浏览器中预览
+
+  注意：模板中的 images/*.png 路径为占位符，实际使用时需替换为真实图片路径
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="{{META_DESCRIPTION}}">
+  <meta name="author" content="{{AUTHOR}}">
+  <title>{{ARTICLE_TITLE}}</title>
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="{{ARTICLE_TITLE}}">
+  <meta property="og:description" content="{{META_DESCRIPTION}}">
+  <meta property="og:image" content="images/cover.png">
+  <meta property="og:type" content="article">
+
+  <style>
+    /* ===== 基础重置 ===== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ===== 整体布局 ===== */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+      line-height: 1.8;
+      color: #333;
+      background: #fafafa;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background: #fff;
+      min-height: 100vh;
+    }
+
+    /* ===== 文章头部 ===== */
+    .article-header {
+      margin-bottom: 40px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .article-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: #000;
+      line-height: 1.3;
+      margin-bottom: 16px;
+    }
+
+    .article-meta {
+      font-size: 14px;
+      color: #999;
+    }
+
+    .article-meta span {
+      margin-right: 16px;
+    }
+
+    .article-meta .author {
+      color: #007AFF;
+    }
+
+    /* ===== 封面图 ===== */
+    .cover-image {
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      margin: 24px 0 40px 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    /* ===== 标题样式 ===== */
+    h1, h2, h3, h4, h5, h6 {
+      color: #111;
+      line-height: 1.4;
+    }
+
+    h2 {
+      font-size: 24px;
+      font-weight: 600;
+      margin: 40px 0 20px 0;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #007AFF;
+    }
+
+    h3 {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 32px 0 16px 0;
+      color: #222;
+    }
+
+    h4 {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 24px 0 12px 0;
+      color: #333;
+    }
+
+    /* ===== 段落样式 ===== */
+    p {
+      margin: 0 0 20px 0;
+      text-align: justify;
+      font-size: 16px;
+    }
+
+    /* ===== 链接样式 ===== */
+    a {
+      color: #007AFF;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    a:hover {
+      color: #0056b3;
+      text-decoration: underline;
+    }
+
+    /* ===== 图片样式 ===== */
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 24px auto;
+      border-radius: 8px;
+    }
+
+    .figure {
+      margin: 32px 0;
+      text-align: center;
+    }
+
+    .figure img {
+      margin: 0 auto 12px auto;
+    }
+
+    .figure-caption {
+      font-size: 14px;
+      color: #666;
+      font-style: italic;
+    }
+
+    /* ===== 引用样式 ===== */
+    blockquote {
+      margin: 24px 0;
+      padding: 16px 24px;
+      background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f5 100%);
+      border-left: 4px solid #007AFF;
+      border-radius: 0 8px 8px 0;
+      color: #555;
+      font-style: italic;
+    }
+
+    blockquote p {
+      margin: 0;
+    }
+
+    /* ===== 代码样式 ===== */
+    code {
+      background: #f4f4f4;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-family: "SF Mono", "Fira Code", Consolas, Monaco, monospace;
+      font-size: 0.9em;
+      color: #e83e8c;
+    }
+
+    pre {
+      background: #2d2d2d;
+      color: #f8f8f2;
+      padding: 20px;
+      border-radius: 12px;
+      overflow-x: auto;
+      margin: 24px 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* ===== 列表样式 ===== */
+    ul, ol {
+      margin: 20px 0;
+      padding-left: 28px;
+    }
+
+    li {
+      margin: 10px 0;
+      line-height: 1.8;
+    }
+
+    ul li::marker {
+      color: #007AFF;
+    }
+
+    ol li::marker {
+      color: #007AFF;
+      font-weight: bold;
+    }
+
+    /* ===== 表格样式 ===== */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+      font-size: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background: #007AFF;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background: #f8f9fa;
+    }
+
+    tr:hover {
+      background: #f1f3f5;
+    }
+
+    /* ===== 分割线 ===== */
+    hr {
+      margin: 40px 0;
+      border: none;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #ddd, transparent);
+    }
+
+    /* ===== 强调样式 ===== */
+    strong {
+      font-weight: 600;
+      color: #000;
+    }
+
+    em {
+      font-style: italic;
+      color: #555;
+    }
+
+    .highlight {
+      background: linear-gradient(120deg, #ffeb3b 0%, #ffeb3b 100%);
+      background-repeat: no-repeat;
+      background-size: 100% 40%;
+      background-position: 0 90%;
+      padding: 0 4px;
+    }
+
+    /* ===== 提示框 ===== */
+    .tip-box {
+      margin: 24px 0;
+      padding: 16px 20px;
+      border-radius: 8px;
+      border-left: 4px solid;
+    }
+
+    .tip-box.info {
+      background: #e7f3ff;
+      border-color: #007AFF;
+    }
+
+    .tip-box.warning {
+      background: #fff3cd;
+      border-color: #ffc107;
+    }
+
+    .tip-box.success {
+      background: #d4edda;
+      border-color: #28a745;
+    }
+
+    .tip-box-title {
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .tip-box p {
+      margin: 0;
+    }
+
+    /* ===== 文章底部 ===== */
+    .article-footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid #eee;
+    }
+
+    .references {
+      margin-bottom: 24px;
+    }
+
+    .references h3 {
+      font-size: 16px;
+      margin-bottom: 12px;
+      color: #666;
+    }
+
+    .references ol {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .references li {
+      margin: 6px 0;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .copyright {
+      font-size: 13px;
+      color: #999;
+      text-align: center;
+      padding: 16px 0;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+
+    /* ===== 响应式设计 ===== */
+    @media (max-width: 768px) {
+      .container {
+        padding: 24px 16px;
+      }
+
+      .article-title {
+        font-size: 24px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+
+      h3 {
+        font-size: 18px;
+      }
+
+      p {
+        font-size: 15px;
+      }
+
+      pre {
+        padding: 16px;
+        font-size: 13px;
+      }
+
+      table {
+        font-size: 14px;
+      }
+
+      th, td {
+        padding: 10px 12px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .article-title {
+        font-size: 20px;
+      }
+
+      .article-meta {
+        font-size: 12px;
+      }
+
+      h2 {
+        font-size: 18px;
+      }
+    }
+
+    /* ===== 打印样式 ===== */
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .container {
+        max-width: 100%;
+        padding: 0;
+      }
+
+      .article-footer {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <article class="container">
+
+    <!-- 文章头部 -->
+    <header class="article-header">
+      <h1 class="article-title">{{ARTICLE_TITLE}}</h1>
+      <div class="article-meta">
+        <span class="author">{{AUTHOR}}</span>
+        <span class="date">{{DATE}}</span>
+        <span class="reading-time">阅读约 {{READING_TIME}} 分钟</span>
+      </div>
+    </header>
+
+    <!-- 封面图 (占位符路径，实际使用时替换) -->
+    <img src="{{COVER_IMAGE}}" alt="{{COVER_DESCRIPTION}}" class="cover-image">
+
+    <!-- ========== 文章内容 ========== -->
+
+    <!-- 引言 -->
+    <p>{{INTRODUCTION}}</p>
+
+    <hr>
+
+    <!-- 第一章 -->
+    <h2>{{SECTION_1_TITLE}}</h2>
+
+    <p>{{SECTION_1_CONTENT}}</p>
+
+    <!-- 章节配图 (占位符路径，实际使用时替换) -->
+    <figure class="figure">
+      <img src="{{CHAPTER_IMAGE}}" alt="{{IMAGE_DESCRIPTION}}">
+      <figcaption class="figure-caption">{{IMAGE_CAPTION}}</figcaption>
+    </figure>
+
+    <!-- 小节 -->
+    <h3>{{SUBSECTION_TITLE}}</h3>
+
+    <p>{{SUBSECTION_CONTENT}}</p>
+
+    <!-- 引用 -->
+    <blockquote>
+      <p>{{QUOTE}}</p>
+    </blockquote>
+
+    <!-- 列表 -->
+    <ul>
+      <li>{{LIST_ITEM_1}}</li>
+      <li>{{LIST_ITEM_2}}</li>
+      <li>{{LIST_ITEM_3}}</li>
+    </ul>
+
+    <!-- 代码块 -->
+    <pre><code>{{CODE_BLOCK}}</code></pre>
+
+    <!-- 提示框 -->
+    <div class="tip-box info">
+      <div class="tip-box-title">💡 提示</div>
+      <p>{{TIP_CONTENT}}</p>
+    </div>
+
+    <!-- 表格 -->
+    <table>
+      <thead>
+        <tr>
+          <th>{{HEADER_1}}</th>
+          <th>{{HEADER_2}}</th>
+          <th>{{HEADER_3}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{CELL_1_1}}</td>
+          <td>{{CELL_1_2}}</td>
+          <td>{{CELL_1_3}}</td>
+        </tr>
+        <tr>
+          <td>{{CELL_2_1}}</td>
+          <td>{{CELL_2_2}}</td>
+          <td>{{CELL_2_3}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr>
+
+    <!-- 结语 -->
+    <h2>结语</h2>
+
+    <p>{{CONCLUSION}}</p>
+
+    <!-- ========== 文章底部 ========== -->
+
+    <footer class="article-footer">
+
+      <!-- 参考资料 -->
+      <div class="references">
+        <h3>参考资料</h3>
+        <ol>
+          <li><a href="{{REF_URL_1}}">{{REF_TITLE_1}}</a></li>
+          <li><a href="{{REF_URL_2}}">{{REF_TITLE_2}}</a></li>
+        </ol>
+      </div>
+
+      <!-- 版权信息 -->
+      <div class="copyright">
+        本文由 AI Article Writer 生成 · 转载请注明出处
+      </div>
+
+    </footer>
+
+  </article>
+
+</body>
+</html>

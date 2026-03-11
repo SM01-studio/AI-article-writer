@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 /Users/www.macpe.cn/.claude/skills/ai-article-writer/scripts/generate_image.py --prompt \"AI artificial intelligence concept, neural network, futuristic technology\" --style \"科技感, 蓝色调, 几何图形, high quality\" --output \"/Users/www.macpe.cn/CC_AI_WRITER/output/test/images/cover.png\" --verbose)",
+      "Bash(lsof -i :8809)",
+      "Bash(curl -s http://localhost:8810/mcp)"
+    ]
+  }
+}
