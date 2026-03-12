@@ -17,6 +17,14 @@
 
 ---
 
+## 🎬 演示视频
+
+https://github.com/user-attachments/assets/demo.mp4
+
+> 观看完整的 6 阶段写作流程演示
+
+---
+
 ## 功能特性
 
 ### 📝 6 阶段自动化写作流程
