@@ -14,9 +14,9 @@
     // 检测是否在 Vercel 生产环境
     const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
 
-    // 生产环境配置 - 指向云服务器 API
+    // 生产环境配置 - 指向云服务器 API (HTTPS)
     if (isProduction) {
-        window.API_BASE_URL = 'http://47.79.0.228/api';
+        window.API_BASE_URL = 'https://api.siliang.cfd/api';
     } else {
         // 开发环境配置 - 使用本地 API
         window.API_BASE_URL = 'http://localhost:5000/api';
