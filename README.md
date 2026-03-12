@@ -19,7 +19,7 @@
 
 ## 🎬 演示视频
 
-https://github.com/user-attachments/assets/demo.mp4
+https://github.com/user-attachments/assets/c457277d-9ba9-4bbf-b33e-8aab90aa9d11
 
 > 观看完整的 6 阶段写作流程演示
 
