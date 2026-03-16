@@ -16,7 +16,7 @@
 
     // 生产环境配置 - 指向云服务器 API (HTTPS)
     if (isProduction) {
-        window.API_BASE_URL = 'https://api.siliang.cfd/api';
+        window.API_BASE_URL = 'https://api.siliang.cfd/api/writer';
     } else {
         // 开发环境配置 - 使用本地 API
         window.API_BASE_URL = 'http://localhost:5000/api';
