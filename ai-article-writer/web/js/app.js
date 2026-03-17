@@ -31,6 +31,25 @@ const pageOrder = ['home', 'research', 'outline', 'draft', 'images', 'layout', '
 let elements = {};
 
 /**
+ * 从 URL 参数中提取并保存 Token（跨域认证）
+ */
+function extractTokenFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('auth_token');
+
+    if (token) {
+        console.log('[Auth] 从 URL 参数获取到 Token');
+        localStorage.setItem('auth_token', token);
+
+        // 清除 URL 中的 token 参数（安全考虑）
+        const cleanUrl = window.location.pathname + window.location.hash;
+        window.history.replaceState({}, document.title, cleanUrl);
+    }
+
+    return token;
+}
+
+/**
  * 验证用户登录状态（生产环境）
  * 检查 localStorage 中的 auth_token 是否有效
  */
@@ -40,6 +59,9 @@ async function verifyAuth() {
         console.log('[Auth] 开发环境，跳过登录验证');
         return true;
     }
+
+    // 先尝试从 URL 参数提取 Token
+    extractTokenFromUrl();
 
     const token = localStorage.getItem('auth_token');
     if (!token) {

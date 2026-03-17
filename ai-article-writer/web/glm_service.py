@@ -372,14 +372,27 @@ class GLMService:
         topic = outline.get("topic", "未知主题")
         chapters = outline.get("chapters", [])
 
+        # 🔧 修复：从大纲获取目标字数
+        target_word_count = outline.get("word_count", "3000")
+        if isinstance(target_word_count, str):
+            target_word_count = int(target_word_count.replace("+", ""))
+
+        # 计算每章节目标字数（扣除标题、引言等）
+        total_chapters = len(chapters)
+        if total_chapters > 0:
+            words_per_chapter = max(200, (target_word_count - 200) // total_chapters)
+        else:
+            words_per_chapter = 500
+
+        print(f"[GLM] 目标总字数: {target_word_count}, 章节数: {total_chapters}, 每章节约: {words_per_chapter} 字")
+
         if on_progress:
-            on_progress(5, "开始生成初稿...")
+            on_progress(5, f"开始生成初稿... (目标: {target_word_count}字)")
 
         # 逐章节生成
         draft_content = f"# {topic}\n\n"
         draft_content += "> 本文由 AI Article Writer 自动生成\n\n"
 
-        total_chapters = len(chapters)
         for i, chapter in enumerate(chapters):
             progress = 10 + int((i / total_chapters) * 80)
             chapter_title = chapter.get('title', '')
@@ -388,22 +401,26 @@ class GLMService:
             if on_progress:
                 on_progress(progress, f"正在撰写: {chapter_title}")
 
+            # 🔧 修复：根据目标字数动态调整每章节字数
+            chapter_min = max(150, words_per_chapter - 100)
+            chapter_max = words_per_chapter + 100
+
             # 生成章节内容
             messages = [
                 {
                     "role": "system",
-                    "content": "你是一个专业的科普文章作者。请撰写章节内容，要求：\n1. 语言流畅，逻辑清晰\n2. 有具体案例或数据支撑\n3. 适合科普文章风格\n4. 字数控制在 300-500 字"
+                    "content": f"你是一个专业的科普文章作者。请撰写章节内容，要求：\n1. 语言流畅，逻辑清晰\n2. 有具体案例或数据支撑\n3. 适合科普文章风格\n4. 字数严格控制在 {chapter_min}-{chapter_max} 字之间"
                 },
                 {
                     "role": "user",
-                    "content": f"请为文章《{topic}》撰写章节 \"{chapter_title}\"。\n\n章节描述: {chapter_desc}\n\n请写 300-500 字的段落内容。"
+                    "content": f"请为文章《{topic}》撰写章节 \"{chapter_title}\"。\n\n章节描述: {chapter_desc}\n\n请写 {chapter_min}-{chapter_max} 字的段落内容。"
                 }
             ]
 
             response = self._call_api(
                 messages=messages,
                 temperature=0.7,
-                max_tokens=1024
+                max_tokens=max(1024, words_per_chapter * 2)
             )
 
             chapter_content = ""

@@ -2586,6 +2586,159 @@ def handle_layout_chat(session: Dict, message: str, history: List) -> Dict:
 
     return {'reply': reply, 'action': 'reply'}
 
+
+# ==================== 管理员 API（文件管理） ====================
+
+@app.route('/api/admin/sessions', methods=['GET'])
+def admin_list_sessions():
+    """管理员：列出所有会话及其文件信息"""
+    import shutil
+
+    sessions_list = []
+    shared_dir = WEB_DIR / 'shared'
+    output_dir = WEB_DIR / 'output'
+
+    # 遍历所有 session 文件
+    if shared_dir.exists():
+        for session_file in shared_dir.glob('session_*.json'):
+            try:
+                session_id = session_file.stem.replace('session_', '')
+                with open(session_file, 'r', encoding='utf-8') as f:
+                    session_data = json.load(f)
+
+                # 获取输出文件信息
+                session_output = output_dir / session_id
+                files = []
+                total_size = 0
+
+                if session_output.exists():
+                    for file_path in session_output.rglob('*'):
+                        if file_path.is_file():
+                            file_size = file_path.stat().st_size
+                            total_size += file_size
+                            files.append({
+                                'name': file_path.name,
+                                'path': str(file_path.relative_to(session_output)),
+                                'size': file_size,
+                                'size_formatted': format_file_size(file_size)
+                            })
+
+                sessions_list.append({
+                    'session_id': session_id,
+                    'topic': session_data.get('topic', '未知主题'),
+                    'current_phase': session_data.get('current_phase', 0),
+                    'created_at': session_data.get('created_at', ''),
+                    'last_updated': session_data.get('last_updated', ''),
+                    'word_count': session_data.get('draft', {}).get('word_count', 0),
+                    'files_count': len(files),
+                    'total_size': total_size,
+                    'total_size_formatted': format_file_size(total_size),
+                    'files': files
+                })
+            except Exception as e:
+                print(f"[Admin] 读取 session 失败: {e}")
+
+    # 按创建时间倒序排列
+    sessions_list.sort(key=lambda x: x.get('created_at', ''), reverse=True)
+
+    return jsonify({
+        'success': True,
+        'sessions': sessions_list,
+        'total': len(sessions_list)
+    })
+
+
+@app.route('/api/admin/sessions/<session_id>', methods=['DELETE'])
+def admin_delete_session(session_id):
+    """管理员：删除指定会话及其所有文件"""
+    import shutil
+
+    deleted_items = []
+
+    # 1. 删除 session 文件
+    session_file = WEB_DIR / 'shared' / f'session_{session_id}.json'
+    if session_file.exists():
+        session_file.unlink()
+        deleted_items.append('session_file')
+
+    # 2. 删除输出目录
+    output_path = WEB_DIR / 'output' / session_id
+    if output_path.exists():
+        shutil.rmtree(output_path)
+        deleted_items.append('output_directory')
+
+    # 3. 删除任务文件（如果有）
+    tasks_dir = WEB_DIR / 'tasks'
+    if tasks_dir.exists():
+        for task_file in tasks_dir.glob(f'*{session_id}*.json'):
+            task_file.unlink()
+            deleted_items.append('task_files')
+
+    # 4. 从内存中移除
+    if session_id in sessions:
+        del sessions[session_id]
+        deleted_items.append('memory_session')
+
+    if deleted_items:
+        return jsonify({
+            'success': True,
+            'message': f'会话 {session_id} 已删除',
+            'deleted_items': deleted_items
+        })
+    else:
+        return jsonify({
+            'success': False,
+            'error': 'Session not found'
+        }), 404
+
+
+@app.route('/api/admin/sessions/batch-delete', methods=['POST'])
+def admin_batch_delete_sessions():
+    """管理员：批量删除会话"""
+    data = request.json
+    session_ids = data.get('session_ids', [])
+
+    if not session_ids:
+        return jsonify({'success': False, 'error': 'No session IDs provided'}), 400
+
+    results = {
+        'success': [],
+        'failed': []
+    }
+
+    for session_id in session_ids:
+        try:
+            # 复用单个删除逻辑
+            with app.test_request_context():
+                response = admin_delete_session(session_id)
+                result = response.get_json()
+                if result.get('success'):
+                    results['success'].append(session_id)
+                else:
+                    results['failed'].append({'id': session_id, 'error': result.get('error')})
+        except Exception as e:
+            results['failed'].append({'id': session_id, 'error': str(e)})
+
+    return jsonify({
+        'success': True,
+        'deleted_count': len(results['success']),
+        'failed_count': len(results['failed']),
+        'results': results
+    })
+
+
+def format_file_size(size_bytes):
+    """格式化文件大小"""
+    if size_bytes < 1024:
+        return f'{size_bytes} B'
+    elif size_bytes < 1024 * 1024:
+        return f'{size_bytes / 1024:.1f} KB'
+    elif size_bytes < 1024 * 1024 * 1024:
+        return f'{size_bytes / (1024 * 1024):.1f} MB'
+    else:
+        return f'{size_bytes / (1024 * 1024 * 1024):.1f} GB'
+
+
 if __name__ == '__main__':
     print("=" * 60)
     print("🚀 AI Article Writer API Server")
