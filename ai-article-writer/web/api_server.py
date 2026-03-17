@@ -12,6 +12,10 @@ import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List
+from dotenv import load_dotenv
+
+# 加载环境变量（从 .env 文件）
+load_dotenv()
 
 # 添加项目路径
 project_root = Path(__file__).parent.parent
@@ -58,6 +62,36 @@ CORS(app, origins=allowed_origins)
 sessions = {}
 
 # ==================== 辅助函数 ====================
+
+def get_synced_session(session_id: str) -> dict:
+    """
+    获取同步后的 session - 始终从共享文件合并最新数据
+    解决多 worker 之间数据不同步的问题
+    """
+    # 先从共享文件获取最新数据
+    shared_session = shared_get_session(session_id)
+
+    if session_id in sessions:
+        # 内存中有数据，合并共享文件的新数据
+        mem_session = sessions[session_id]
+
+        if shared_session:
+            # 合并共享文件中的最新数据（共享文件优先）
+            for key in ['outline', 'confirmed_outline', 'research_data', 'draft', 'images', 'length', 'audience', 'topic']:
+                if key in shared_session and shared_session[key] is not None:
+                    mem_session[key] = shared_session[key]
+            session = mem_session
+        else:
+            session = mem_session
+    else:
+        # 内存中没有，使用共享文件数据
+        if shared_session:
+            session = shared_session
+            sessions[session_id] = session
+        else:
+            session = None
+
+    return session
 
 def save_outline_result(session_id: str, outline: dict):
     """保存大纲结果到共享文件"""
@@ -212,11 +246,14 @@ def create_session():
     """创建新的写作会话"""
     data = request.json
     session_id = datetime.now().strftime('%Y%m%d_%H%M%S')
+    topic = data.get('topic', '')
+    length = data.get('length', 'medium')
+    audience = data.get('audience', 'general')
 
     sessions[session_id] = {
-        'topic': data.get('topic', ''),
-        'length': data.get('length', 'medium'),
-        'audience': data.get('audience', 'general'),
+        'topic': topic,
+        'length': length,
+        'audience': audience,
         'current_phase': 0,
         'research_data': None,
         'outline': None,
@@ -227,10 +264,16 @@ def create_session():
         'created_at': datetime.now().isoformat()
     }
 
+    # 🔧 修复：同时保存到共享文件，确保跨 worker 数据同步
+    shared_create_session(session_id, topic, length, audience)
+    print(f"[API] 会话已创建: {session_id}, 字数: {length}, 读者: {audience}")
+
     return jsonify({
         'success': True,
         'session_id': session_id,
-        'message': 'Session created successfully'
+        'message': 'Session created successfully',
+        'length': length,
+        'audience': audience
     })
 
 @app.route('/api/sync/<phase>', methods=['POST'])
@@ -490,10 +533,19 @@ def generate_outline():
     data = request.json
     session_id = data.get('session_id')
 
-    if not session_id or session_id not in sessions:
+    if not session_id:
         return jsonify({'success': False, 'error': 'Invalid session'}), 400
 
-    session = sessions[session_id]
+    # 🔧 修复：使用同步函数获取最新 session 数据（包含 Phase 1 的 length, audience 等）
+    session = get_synced_session(session_id)
+    if not session:
+        return jsonify({'success': False, 'error': 'Invalid session'}), 400
+        session = shared_get_session(session_id)
+        if session:
+            sessions[session_id] = session
+            print(f"[API] 从共享文件加载会话: {session_id}")
+        else:
+            return jsonify({'success': False, 'error': 'Invalid session'}), 400
     length = session.get('length', 'medium')
     audience = session.get('audience', 'general')
 
@@ -575,10 +627,10 @@ def outline_feedback():
     confirmed_items = data.get('confirmed_items', {})  # 确认的项目
     feedback = data.get('feedback')
 
-    if not session_id or session_id not in sessions:
+    # 🔧 修复：使用同步函数获取最新 session 数据
+    session = get_synced_session(session_id)
+    if not session:
         return jsonify({'success': False, 'error': 'Invalid session'}), 400
-
-    session = sessions[session_id]
 
     # 处理确认请求
     if feedback_type == 'confirmation':
@@ -673,13 +725,17 @@ def generate_draft():
     data = request.json
     session_id = data.get('session_id')
 
-    if not session_id or session_id not in sessions:
+    if not session_id:
+        return jsonify({'success': False, 'error': 'Missing session_id'}), 400
+
+    # 🔧 修复：使用同步函数获取最新 session 数据
+    session = get_synced_session(session_id)
+    if not session:
         return jsonify({'success': False, 'error': 'Invalid session'}), 400
 
-    session = sessions[session_id]
     topic = session.get('topic', '未知主题')
 
-    # 获取大纲和调研数据
+    # 获取大纲和调研数据（已通过 get_synced_session 同步）
     outline = session.get('outline', {})
     research = session.get('research_data', {})
 
@@ -784,10 +840,10 @@ def generate_images():
     session_id = data.get('session_id')
     custom_style = data.get('style', None)  # 允许自定义风格
 
-    if not session_id or session_id not in sessions:
+    # 🔧 修复：使用同步函数获取最新 session 数据
+    session = get_synced_session(session_id)
+    if not session:
         return jsonify({'success': False, 'error': 'Invalid session'}), 400
-
-    session = sessions[session_id]
 
     # 获取文章信息
     outline = session.get('outline', {})
@@ -902,15 +958,10 @@ def generate_images_stream():
     if not session_id:
         return jsonify({'success': False, 'error': 'Missing session_id'}), 400
 
-    # 获取 session
-    session = sessions.get(session_id)
+    # 🔧 修复：使用同步函数获取最新 session 数据
+    session = get_synced_session(session_id)
     if not session:
-        shared_session = shared_get_session(session_id)
-        if shared_session:
-            session = shared_session
-            sessions[session_id] = session
-        else:
-            return jsonify({'success': False, 'error': 'Invalid session'}), 400
+        return jsonify({'success': False, 'error': 'Invalid session'}), 400
 
     def generate():
         # 获取文章信息
@@ -1075,15 +1126,29 @@ def regenerate_single_image():
     session_id = data.get('session_id')
     image_name = data.get('image_name')
 
-    if not session_id or session_id not in sessions:
+    # 🔧 修复：使用同步函数获取最新 session 数据
+    session = get_synced_session(session_id)
+    if not session:
         return jsonify({'success': False, 'error': 'Invalid session'}), 400
 
-    session = sessions[session_id]
     images_data = session.get('images', {})
+
+    # 🔧 修复：兼容 images_data 可能是列表或字典的情况
+    if isinstance(images_data, list):
+        # 如果是列表，包装成字典格式
+        images_list = images_data
+        images_data = {
+            'images': images_list,
+            'style_keywords': '科技感, 蓝色调, high quality, detailed, 4K'
+        }
+    elif isinstance(images_data, dict):
+        images_list = images_data.get('images', [])
+    else:
+        images_list = []
 
     # 找到要重新生成的图片
     target_image = None
-    for img in images_data.get('images', []):
+    for img in images_list:
         if img.get('name') == image_name:
             target_image = img
             break
@@ -1114,9 +1179,12 @@ def regenerate_single_image():
         target_image['regenerated_at'] = datetime.now().isoformat()
 
         # 更新统计
-        success_count = sum(1 for img in images_data.get('images', []) if img.get('success'))
+        success_count = sum(1 for img in images_list if img.get('success'))
         images_data['success_count'] = success_count
-        images_data['failed_count'] = len(images_data.get('images', [])) - success_count
+        images_data['failed_count'] = len(images_list) - success_count
+
+        # 🔧 同步更新到共享文件
+        shared_update_session(session_id, images=images_data)
 
         print(f"[API] 重新生成配图: {image_name} - {'成功' if result.get('success') else '失败'}")
 
@@ -1183,15 +1251,10 @@ def generate_layout():
     if not session_id:
         return jsonify({'success': False, 'error': 'Missing session_id'}), 400
 
-    # 🔧 修复：同时检查内存和共享文件
-    session = sessions.get(session_id)
+    # 🔧 修复：使用同步函数获取最新 session 数据
+    session = get_synced_session(session_id)
     if not session:
-        shared_session = shared_get_session(session_id)
-        if shared_session:
-            session = shared_session
-            sessions[session_id] = session
-        else:
-            return jsonify({'success': False, 'error': 'Invalid session'}), 400
+        return jsonify({'success': False, 'error': 'Invalid session'}), 400
 
     # 获取数据
     draft = session.get('draft', {})
@@ -1296,12 +1359,13 @@ def generate_layout():
     # 5. 生成 DOCX 文件
     try:
         docx_path = output_dir / 'wechat.docx'
-        html_to_docx_script = Path(__file__).parent.parent / 'scripts' / 'html_to_docx.py'
+        # 🔧 修复：脚本在 web/scripts/ 目录下，不是上级目录
+        html_to_docx_script = Path(__file__).parent / 'scripts' / 'html_to_docx.py'
 
         if html_to_docx_script.exists():
             import subprocess
             result = subprocess.run(
-                ['python', str(html_to_docx_script),
+                [sys.executable, str(html_to_docx_script),
                  '--input', str(wechat_path),
                  '--output', str(docx_path)],
                 capture_output=True,
@@ -1603,10 +1667,10 @@ def layout_feedback():
     session_id = data.get('session_id')
     feedback = data.get('feedback')
 
-    if not session_id or session_id not in sessions:
+    # 🔧 修复：使用同步函数获取最新 session 数据
+    session = get_synced_session(session_id)
+    if not session:
         return jsonify({'success': False, 'error': 'Invalid session'}), 400
-
-    session = sessions[session_id]
     session['feedbacks']['layout'] = feedback
 
     # 根据反馈更新排版
@@ -1627,10 +1691,10 @@ def complete_export():
     data = request.json
     session_id = data.get('session_id')
 
-    if not session_id or session_id not in sessions:
+    # 🔧 修复：使用同步函数获取最新 session 数据
+    session = get_synced_session(session_id)
+    if not session:
         return jsonify({'success': False, 'error': 'Invalid session'}), 400
-
-    session = sessions[session_id]
 
     # 生成最终导出信息
     export_data = {
@@ -2376,31 +2440,36 @@ def handle_draft_chat(session: Dict, message: str, history: List) -> Dict:
             # 解析 AI 返回的 JSON
             json_match = re.search(r'\{[\s\S]*\}', ai_content)
             if json_match:
-                result = json.loads(json_match.group())
-                action = result.get('action', 'reply')
-                content = result.get('content', '')
+                try:
+                    result = json.loads(json_match.group())
+                    action = result.get('action', 'reply')
+                    content = result.get('content', '')
 
-                if action == 'update' and content:
-                    # 先从 session 获取最新的数据，确保不丢失之前的修改
-                    latest_draft = session.get('draft') or {}
+                    if action == 'update' and content:
+                        # 先从 session 获取最新的数据，确保不丢失之前的修改
+                        latest_draft = session.get('draft') or {}
 
-                    # 更新文章内容
-                    latest_draft['content'] = content
-                    latest_draft['word_count'] = len(content)
-                    latest_draft['last_modified'] = datetime.now().isoformat()
-                    session['draft'] = latest_draft
+                        # 更新文章内容
+                        latest_draft['content'] = content
+                        latest_draft['word_count'] = len(content)
+                        latest_draft['last_modified'] = datetime.now().isoformat()
+                        session['draft'] = latest_draft
 
-                    return {
-                        'reply': '✅ 已根据您的要求修改内容，请查看「内容预览」区域。',
-                        'updated_content': latest_draft,
-                        'action': 'update'
-                    }
-                else:
-                    # 只是回复
-                    return {
-                        'reply': content or ai_content,
-                        'action': 'reply'
-                    }
+                        return {
+                            'reply': '✅ 已根据您的要求修改内容，请查看「内容预览」区域。',
+                            'updated_content': latest_draft,
+                            'action': 'update'
+                        }
+                    else:
+                        # 只是回复
+                        return {
+                            'reply': content or ai_content,
+                            'action': 'reply'
+                        }
+                except json.JSONDecodeError as je:
+                    print(f"[Chat] JSON 解析失败: {je}, AI 返回内容: {ai_content[:200]}...")
+                    # JSON 解析失败，继续往下走，检查是否是纯文本内容
+                    pass
 
             # 如果无法解析 JSON，检查内容长度判断是修改还是回复
             if len(ai_content) > 500:

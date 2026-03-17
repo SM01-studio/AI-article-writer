@@ -17,12 +17,20 @@
     // 生产环境配置 - 指向云服务器 API (HTTPS)
     if (isProduction) {
         window.API_BASE_URL = 'https://api.siliang.cfd/api/writer';
+        // 主门户 API（用于登录验证）
+        window.AUTH_API_URL = 'https://api.siliang.cfd/api/auth';
+        // 主门户登录页
+        window.LOGIN_URL = 'https://siliang.cfd/index.html';
     } else {
         // 开发环境配置 - 使用本地 API
         window.API_BASE_URL = 'http://localhost:5000/api';
+        // 本地开发跳过登录验证
+        window.AUTH_API_URL = null;
+        window.LOGIN_URL = null;
     }
 
     console.log('🔗 API Base URL:', window.API_BASE_URL);
+    console.log('🔐 Auth API URL:', window.AUTH_API_URL);
     console.log('🌍 Environment:', isProduction ? 'Production' : 'Development');
 
 })();

@@ -248,11 +248,11 @@ class PhaseHandler:
 
         print(f"[PhaseHandler] 生成大纲模板: {topic}")
 
-        # 根据长度确定结构
+        # 根据长度确定结构（字数与前端 app.js getWordCount 和 glm_service.py 保持一致）
         structures = {
             'short': {
                 'chapter_count': 4,
-                'word_count': '2000',
+                'word_count': '1500',
                 'template': [
                     {'number': 0, 'title': '引言', 'description': f'为什么关注{topic[:15]}'},
                     {'number': 1, 'title': '核心概念', 'description': f'{topic[:15]}是什么'},
@@ -262,7 +262,7 @@ class PhaseHandler:
             },
             'medium': {
                 'chapter_count': 6,
-                'word_count': '4000',
+                'word_count': '3000',
                 'template': [
                     {'number': 0, 'title': '引言', 'description': f'为什么关注{topic[:15]}'},
                     {'number': 1, 'title': '核心概念', 'description': f'{topic[:15]}是什么'},

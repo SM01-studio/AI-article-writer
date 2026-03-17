@@ -30,8 +30,56 @@ const pageOrder = ['home', 'research', 'outline', 'draft', 'images', 'layout', '
 // DOM 元素缓存
 let elements = {};
 
+/**
+ * 验证用户登录状态（生产环境）
+ * 检查 localStorage 中的 auth_token 是否有效
+ */
+async function verifyAuth() {
+    // 本地开发环境跳过验证
+    if (!window.AUTH_API_URL) {
+        console.log('[Auth] 开发环境，跳过登录验证');
+        return true;
+    }
+
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+        console.log('[Auth] 未找到 token，跳转到登录页');
+        window.location.href = window.LOGIN_URL;
+        return false;
+    }
+
+    try {
+        const response = await fetch(`${window.AUTH_API_URL}/me`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            console.log('[Auth] Token 无效，跳转到登录页');
+            localStorage.removeItem('auth_token');
+            window.location.href = window.LOGIN_URL;
+            return false;
+        }
+
+        const data = await response.json();
+        console.log('[Auth] 登录验证成功:', data.user?.username || data.user?.email);
+        return true;
+    } catch (error) {
+        console.error('[Auth] 验证失败:', error);
+        // 网络错误时允许继续使用（避免因网络问题阻断用户）
+        return true;
+    }
+}
+
 // 初始化
-function init() {
+async function init() {
+    // 生产环境先验证登录状态
+    const isAuthed = await verifyAuth();
+    if (!isAuthed) {
+        return; // 正在跳转，不继续初始化
+    }
+
     cacheElements();
     setupEventListeners();
     initParticles();
