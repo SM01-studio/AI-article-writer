@@ -3131,9 +3131,12 @@ function renderLayoutFromApi(data) {
     if (data.files && data.files.length > 0) {
         const filteredFiles = data.files.filter(file => !file.name.endsWith('/'));
         filesHtml = filteredFiles.map(file => {
-            // 修复下载 URL：使用 API_BASE_URL
+            // 修复下载 URL：正确处理 API_BASE_URL
+            // 生产环境 API_BASE_URL = 'https://api.siliang.cfd/api/writer'
+            // 需要提取 'https://api.siliang.cfd' 作为下载基础 URL
+            const apiBaseForDownload = API_BASE_URL.replace(/\/api\/writer$/, '').replace(/\/api$/, '');
             const downloadUrl = file.download_url
-                ? `${API_BASE_URL.replace('/api', '')}${file.download_url}`
+                ? `${apiBaseForDownload}${file.download_url}`
                 : null;
             const downloadBtn = downloadUrl ? `
                 <a href="${downloadUrl}" download="${file.name}"

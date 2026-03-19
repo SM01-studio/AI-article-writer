@@ -63,6 +63,23 @@ sessions = {}
 
 # ==================== 辅助函数 ====================
 
+def count_words(text: str) -> int:
+    """
+    统计文本字数（中英文混合）
+    - 中文：按字符数计算
+    - 英文：按单词数计算
+    """
+    import re
+    if not text:
+        return 0
+    # 移除 Markdown 标记
+    text = re.sub(r'[#*_`~\[\]()>-]', '', text)
+    # 统计中文字符
+    chinese_chars = len(re.findall(r'[\u4e00-\u9fff]', text))
+    # 统计英文单词
+    english_words = len(re.findall(r'[a-zA-Z]+', text))
+    return chinese_chars + english_words
+
 def get_synced_session(session_id: str) -> dict:
     """
     获取同步后的 session - 始终从共享文件合并最新数据
@@ -2451,7 +2468,7 @@ def handle_draft_chat(session: Dict, message: str, history: List) -> Dict:
 
                         # 更新文章内容
                         latest_draft['content'] = content
-                        latest_draft['word_count'] = len(content)
+                        latest_draft['word_count'] = count_words(content)
                         latest_draft['last_modified'] = datetime.now().isoformat()
                         session['draft'] = latest_draft
 
@@ -2477,7 +2494,7 @@ def handle_draft_chat(session: Dict, message: str, history: List) -> Dict:
                 latest_draft = session.get('draft') or {}
                 # 内容较长，可能是修改后的文章
                 latest_draft['content'] = ai_content
-                latest_draft['word_count'] = len(ai_content)
+                latest_draft['word_count'] = count_words(ai_content)
                 latest_draft['last_modified'] = datetime.now().isoformat()
                 session['draft'] = latest_draft
 
