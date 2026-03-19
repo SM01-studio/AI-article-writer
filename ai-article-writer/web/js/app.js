@@ -1060,12 +1060,12 @@ async function generateImagesWithSSE(sessionId) {
             reject(error);
         };
 
-        // 超时保护
+        // 超时保护（15分钟，适应多张图片生成）
         setTimeout(() => {
             stopTimer();
             eventSource.close();
             reject(new Error('SSE timeout'));
-        }, 300000); // 5分钟超时
+        }, 900000); // 15分钟超时
     });
 }
 
