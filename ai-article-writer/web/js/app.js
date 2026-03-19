@@ -52,6 +52,7 @@ function extractTokenFromUrl() {
 /**
  * 验证用户登录状态（生产环境）
  * 检查 localStorage 中的 auth_token 是否有效
+ * 🔧 优化：添加缓存和超时处理，加快页面加载
  */
 async function verifyAuth() {
     // 本地开发环境跳过验证
@@ -66,30 +67,61 @@ async function verifyAuth() {
     const token = localStorage.getItem('auth_token');
     if (!token) {
         console.log('[Auth] 未找到 token，跳转到登录页');
-        window.location.href = window.LOGIN_URL;
+        window.location.href = window.LOGIN_URL + '?from=subapp';
         return false;
     }
+
+    // 🔧 优化：检查缓存，避免重复请求
+    const cachedAuth = sessionStorage.getItem('auth_verified');
+    const cacheTime = sessionStorage.getItem('auth_verified_time');
+    const CACHE_DURATION = 5 * 60 * 1000; // 5 分钟缓存
+
+    if (cachedAuth === 'true' && cacheTime && (Date.now() - parseInt(cacheTime)) < CACHE_DURATION) {
+        console.log('[Auth] 使用缓存，跳过验证');
+        return true;
+    }
+
+    // 🔧 优化：添加超时处理（3秒）
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
 
     try {
         const response = await fetch(`${window.AUTH_API_URL}/me`, {
             headers: {
                 'Authorization': `Bearer ${token}`
-            }
+            },
+            signal: controller.signal
         });
+
+        clearTimeout(timeoutId);
 
         if (!response.ok) {
             console.log('[Auth] Token 无效，跳转到登录页');
             localStorage.removeItem('auth_token');
-            window.location.href = window.LOGIN_URL;
+            sessionStorage.removeItem('auth_verified');
+            window.location.href = window.LOGIN_URL + '?from=subapp';
             return false;
         }
 
         const data = await response.json();
         console.log('[Auth] 登录验证成功:', data.user?.username || data.user?.email);
+
+        // 🔧 优化：缓存验证结果
+        sessionStorage.setItem('auth_verified', 'true');
+        sessionStorage.setItem('auth_verified_time', Date.now().toString());
+
         return true;
     } catch (error) {
+        clearTimeout(timeoutId);
+
+        // 超时或网络错误时，如果之前验证过，允许继续使用
+        if (cachedAuth === 'true') {
+            console.log('[Auth] 网络错误，使用缓存结果继续');
+            return true;
+        }
+
         console.error('[Auth] 验证失败:', error);
-        // 网络错误时允许继续使用（避免因网络问题阻断用户）
+        // 首次验证失败也允许继续使用（避免因网络问题阻断用户）
         return true;
     }
 }
