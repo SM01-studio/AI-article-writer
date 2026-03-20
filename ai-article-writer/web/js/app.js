@@ -136,7 +136,7 @@ async function init() {
 
     cacheElements();
     setupEventListeners();
-    initParticles();
+    // initParticles(); // 暂时关闭粒子效果测试卡顿
     updateLengthButtons();
 }
 
