@@ -4,6 +4,132 @@
 
 ---
 
+## 2026-03-19 (周四)
+
+### 完成的工作
+
+#### 1. 修复 Chrome 浏览器卡顿问题
+
+**问题**：从主门户跳转到 AI Writer 子页面后，Chrome 浏览器严重卡顿，粒子效果迟缓
+
+**排查过程**：
+1. 怀疑粒子效果优化导致 → 回滚代码后问题依旧
+2. Safari 浏览器正常 → 排除代码问题
+3. 最终确认：Chrome 缓存了线上错误的代码
+
+**解决**：清除 Chrome 浏览器缓存（`Cmd+Shift+R` 强制刷新）
+
+---
+
+#### 2. 修复 Phase 4 字数统计问题
+
+**问题**：Phase 4 完成正文环节，字数统计显示不正确
+
+**原因**：`len(content)` 计算的是字符数，不是字数
+
+**修复**：添加 `count_words()` 函数，准确计算中英文字数
+```python
+def count_words(text: str) -> int:
+    """统计文本字数（中英文混合）"""
+    import re
+    if not text:
+        return 0
+    # 移除 Markdown 标记
+    text = re.sub(r'[#*_`~\[\]()>-]', '', text)
+    # 统计中文字符
+    chinese_chars = len(re.findall(r'[\u4e00-\u9fff]', text))
+    # 统计英文单词
+    english_words = len(re.findall(r'[a-zA-Z]+', text))
+    return chinese_chars + english_words
+```
+
+**修改文件**：`api_server.py`
+
+---
+
+#### 3. 修复 Phase 5 下载路径问题
+
+**问题**：Phase 5 下载按钮无响应，下载路径不正确
+
+**原因**：`API_BASE_URL.replace('/api', '')` 在生产环境下错误
+- 生产环境 `API_BASE_URL` = `https://api.siliang.cfd/api/writer`
+- `.replace('/api', '')` = `https://api.siliang.cfd/writer`（错误）
+
+**修复**：使用正则表达式正确提取基础 URL
+```javascript
+const apiBaseForDownload = API_BASE_URL.replace(/\/api\/writer$/, '').replace(/\/api$/, '');
+```
+
+**修改文件**：`app.js`
+
+---
+
+#### 4. 优化页面跳转速度（认证缓存）
+
+**问题**：从主门户跳转到子页面等待时间过长
+
+**原因**：每次访问都需等待认证 API 验证（约 1.1 秒）
+
+**优化方案**：
+- 添加 5 分钟缓存，避免重复验证
+- 添加 3 秒超时保护
+- 网络错误时使用缓存结果继续
+
+**修改文件**：`app.js` - `verifyAuth()` 函数
+
+---
+
+#### 5. 增加 SSE 超时时间
+
+**问题**：Phase 4 配图生成超过 5 分钟后前端超时
+
+**修复**：SSE 超时从 5 分钟增加到 15 分钟
+
+**修改文件**：`app.js`
+
+---
+
+### 待解决问题
+
+#### Phase 4 配图生成失败
+
+**现象**：配图生成 2 分钟后连接断开，显示"配图生成服务暂时不可用"
+
+**排查结果**：
+- 前端 SSE 超时：已增加到 15 分钟 ✅
+- Nginx 超时：600s 配置正确 ✅
+- Gemini API 密钥：有效 ✅
+- **根本原因**：第三方 API `api.apicore.ai` 返回 524 超时错误（Cloudflare 超时）
+
+**状态**：⏸️ 等待第三方 API 服务恢复
+
+---
+
+### 已推送的 Git 提交
+
+| 提交 | 说明 |
+|------|------|
+| `6350eda` | fix: Phase 4 word count and Phase 5 download URL |
+| `a202ed5` | perf: Add auth cache and timeout to speed up page load |
+| `4de7a2c` | fix: Increase SSE timeout to 15min for image generation |
+
+---
+
+### 测试结果汇总
+
+| 阶段 | 功能 | 状态 |
+|------|------|------|
+| 首页 | 页面加载 | ✅ 正常 |
+| 跳转 | 主门户 → 子页面 | ✅ 优化后快速 |
+| Phase 1 | 深度调研 | ✅ 通过 |
+| Phase 2 | 大纲设计 | ✅ 通过 |
+| Phase 3 | 内容撰写 | ✅ 通过 |
+| Phase 4 | AI 配图 | ⏸️ 第三方 API 超时 |
+| Phase 5 | 排版输出 | 待测试 |
+| Phase 6 | 完成导出 | 待测试 |
+
+---
+
 ## 2026-03-17 (周一)
 
 ### 完成的工作

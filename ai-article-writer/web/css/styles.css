@@ -89,9 +89,7 @@ body {
     width: 120%;
     height: 120%;
     border-radius: 50%;
-    filter: blur(120px);
-    opacity: 0.3;
-    animation: aurora-float 25s ease-in-out infinite;
+    opacity: 0.25;
 }
 
 .aurora-1 { top: -40%; left: -20%; background: radial-gradient(circle, rgba(99, 102, 241, 0.4) 0%, transparent 70%); animation-delay: 0s; }
@@ -99,37 +97,22 @@ body {
 .aurora-3 { bottom: -20%; left: -20%; background: radial-gradient(circle, rgba(168, 85, 247, 0.25) 0%, transparent 70%); animation-delay: -12s; }
 .aurora-4 { bottom: -40%; right: -20%; background: radial-gradient(circle, rgba(236, 72, 153, 0.2) 0%, transparent 70%); animation-delay: -18s; }
 
-@keyframes aurora-float {
-    0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
-    25% { transform: translate(3%, 3%) rotate(90deg) scale(1.05); }
-    50% { transform: translate(-3%, 6%) rotate(180deg) scale(1); }
-    75% { transform: translate(5%, -3%) rotate(270deg) scale(1.05); }
-}
-
-#particles {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 1;
-}
 
 /* Navigation */
 .nav-glass {
     position: fixed;
     top: var(--spacing-md);
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%) translateZ(0);
     z-index: 100;
     background: rgba(20, 20, 40, 0.8);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-xl);
     padding: var(--spacing-sm) var(--spacing-lg);
     box-shadow: var(--glass-shadow);
+    will-change: transform;
 }
 
 .nav-content {
@@ -242,8 +225,7 @@ body {
     height: 6px;
     background: #4ade80;
     border-radius: 50%;
-    animation: pulse 2s ease-in-out infinite;
-}
+    }
 
 .hero-badge span:last-child {
     color: var(--text-secondary);
@@ -265,13 +247,8 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    animation: gradient-shift 5s ease-in-out infinite;
-}
+    }
 
-@keyframes gradient-shift {
-    0%, 100% { background-position: 0% center; }
-    50% { background-position: 100% center; }
-}
 
 .hero-subtitle {
     font-size: 0.95rem;
@@ -283,8 +260,8 @@ body {
 /* Input Card */
 .input-card {
     background: var(--bg-card);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-xl);
     padding: var(--spacing-lg);
@@ -516,8 +493,8 @@ body {
     gap: var(--spacing-lg);
     padding: var(--spacing-md) var(--spacing-lg);
     background: var(--bg-card);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-xl);
     margin-bottom: var(--spacing-xl);
@@ -588,8 +565,7 @@ body {
     height: 6px;
     background: #fbbf24;
     border-radius: 50%;
-    animation: pulse 2s ease-in-out infinite;
-}
+    }
 
 .page-status.success .status-dot {
     background: #4ade80;
@@ -601,16 +577,12 @@ body {
     font-weight: 500;
 }
 
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-}
 
 /* Page Content */
 .page-content {
     background: var(--bg-card);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-xl);
     padding: var(--spacing-xl);
@@ -1390,8 +1362,7 @@ body {
     height: 8px;
     background: #fbbf24;
     border-radius: 50%;
-    animation: pulse 2s ease-in-out infinite;
-}
+    }
 
 .page-status.success .status-dot {
     background: #4ade80;
@@ -1404,8 +1375,8 @@ body {
 
 .page-content {
     background: var(--bg-card);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-xl);
     padding: var(--spacing-xl);
@@ -1492,8 +1463,7 @@ body {
     height: 6px;
     background: #4ade80;
     border-radius: 50%;
-    animation: pulse 2s ease-in-out infinite;
-}
+    }
 
 .hero-badge span:last-child {
     color: var(--text-secondary);
@@ -1522,8 +1492,8 @@ body {
 /* Input Card */
 .input-card {
     background: var(--bg-card);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-xl);
     padding: var(--spacing-lg);

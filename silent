@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <!-- Custom Styles -->
-    <link rel="stylesheet" href="dist/css/styles.min.css">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
     <!-- Aurora Background -->
@@ -24,6 +24,9 @@
         <div class="aurora aurora-3"></div>
         <div class="aurora aurora-4"></div>
     </div>
+
+    <!-- Particle Canvas -->
+    <canvas id="particles"></canvas>
 
     <!-- Navigation -->
     <nav class="nav-glass">
@@ -434,6 +437,6 @@
     <!-- Scripts -->
     <script src="config.js"></script>
     <script src="js/api.js"></script>
-    <script src="dist/js/app.min.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
