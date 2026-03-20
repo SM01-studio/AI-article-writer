@@ -66,3 +66,6 @@ xiaohongshu_mcp/.venv/
 *.temp
 .cache/
 weixin_search_mcp/
+
+# Local development logs (not for remote)
+DEVELOPMENT_LOG.md
