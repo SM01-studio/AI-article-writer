@@ -121,8 +121,10 @@ async function verifyAuth() {
         }
 
         console.error('[Auth] 验证失败:', error);
-        // 首次验证失败也允许继续使用（避免因网络问题阻断用户）
-        return true;
+        // 首次验证失败，跳转到登录页（安全优先）
+        localStorage.removeItem('auth_token');
+        window.location.href = window.LOGIN_URL + '?from=subapp&error=auth_failed';
+        return false;
     }
 }
 
